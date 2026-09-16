@@ -7,9 +7,522 @@
   --color-launch-violet: #b356ff;
   --color-ink: #050507;
   --color-panel: #0d0d13;
+  --color-panel-2: #111116;
+
+  /* ------------------------------------------------------------------
+     Accessible neutral text ramp for the dark surfaces.
+
+     Tailwind's default greys are too dark against this near-black
+     palette: text-zinc-500 (#71717a) measures 4.21:1 and text-zinc-600
+     (#52525b) only 2.63:1 on --color-ink, both below the WCAG 2.1 AA
+     floor of 4.5:1 for body text.
+
+     These two steps are verified against *every* surface in the design
+     system, including the lightest composited one (white/[0.07] over
+     --color-panel = #1e1e24):
+
+       muted   6.04:1 on ink, 4.92:1 worst case  — secondary text, labels
+       subtle  5.64:1 on ink, 4.60:1 worst case  — meta text, icons, placeholders
+
+     Use text-muted / text-subtle instead of text-zinc-500 / text-zinc-600.
+     Neither token is safe on a light background — see NewsletterForm for
+     the light-surface equivalent.
+     ------------------------------------------------------------------ */
+  --color-muted: #8b8b95;
+  --color-subtle: #86868f;
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+
+html {
+  /* The header is fixed; anchor jumps should land clear of it. */
+  scroll-padding-top: 6.5rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+/* A single, consistent focus treatment across the whole site.
+ *
+ * Deliberately no `border-radius` here. Browsers have traced the outline around
+ * the element's own corners since Chrome 94 / Firefox 88 / Safari 16.4, and the
+ * old `border-radius: 0.5rem` overrode `rounded-full` — which turned every
+ * circular control, the dock bubbles included, into an 8px rounded square the
+ * moment it received keyboard focus. */
+:focus-visible {
+  outline: 2px solid var(--color-launch-pink-soft);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Brand utilities                                                     */
+/* ------------------------------------------------------------------ */
+
+/* Gradient text used for emphasised words in headings. */
+.text-launch-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-launch-pink) 0%,
+    #ff5aa1 45%,
+    var(--color-launch-violet) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Faint dotted grid used behind hero and CTA bands. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+}
+
+/* 1px gradient rule that fades at both ends. */
+.rule-gradient {
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 23, 110, 0.55),
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Floating action bubbles — 3D treatment                              */
+/* ------------------------------------------------------------------ */
+
+/* One physical recipe shared by the dock's circular controls so the three read
+ * as a family rather than three flat discs:
+ *
+ *   - a soft radial sheen from above (the light source)
+ *   - a vertical light→base→deep ramp, which is what makes the face look domed
+ *   - an inset 1px top rim light plus a bottom inner shade for volume
+ *   - two outer shadows: a tight contact shadow that seats it on the page, and
+ *     a wider coloured ambient glow
+ *
+ * Only the palette varies, via the --bubble-* custom properties set by the
+ * modifiers below. Every --bubble-top is the *lightest* surface the glyph can
+ * sit on, and each keeps the dark #050507 glyph at 7:1 or better — so the depth
+ * cues are free, they never trade away contrast. Check that before adding a
+ * fourth colour: the lightest stop is the one that decides legibility, not the
+ * base colour you started from. */
+.bubble-3d {
+  background-image:
+    radial-gradient(
+      115% 115% at 50% -12%,
+      rgba(255, 255, 255, 0.36) 0%,
+      rgba(255, 255, 255, 0) 58%
+    ),
+    linear-gradient(
+      180deg,
+      var(--bubble-top) 0%,
+      var(--bubble) 54%,
+      var(--bubble-deep) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -5px 9px -3px rgba(0, 0, 0, 0.38),
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 8px 16px -6px rgba(0, 0, 0, 0.5),
+    0 16px 34px -10px var(--bubble-glow);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+}
+
+/* Hover: the light lifts and the glow spreads — the puck rises toward you. */
+.bubble-3d:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -5px 9px -3px rgba(0, 0, 0, 0.34),
+    0 2px 3px rgba(0, 0, 0, 0.3),
+    0 12px 24px -6px rgba(0, 0, 0, 0.5),
+    0 24px 48px -12px var(--bubble-glow-strong);
+}
+
+/* Pressed: the dome flattens into its own shadow instead of lifting further. */
+.bubble-3d:active {
+  transform: translateY(1px) scale(0.955);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 3px 6px rgba(0, 0, 0, 0.32),
+    0 1px 2px rgba(0, 0, 0, 0.32),
+    0 5px 12px -6px var(--bubble-glow);
+}
+
+/* The glyph sits proud of the surface rather than printed flat on it. */
+.bubble-3d svg {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  transition: filter 220ms ease;
+}
+
+.bubble-3d:hover svg {
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.36));
+}
+
+/* Deep stops are kept deliberately light. Darkening them buys a little more
+ * dome, but the gradient's lower half is where the glyph's bottom edge lands,
+ * and it drags the icon contrast down with it — measured on the rendered
+ * pixels, #b30049 put the chat glyph at 3.0:1 and #7a1ed4 the call glyph at
+ * 2.9:1. These values hold every glyph at 4.6:1 or better while the inset
+ * bottom shade still supplies the volume. */
+.bubble-3d--whatsapp {
+  --bubble-top: #4fe58a;
+  --bubble: #25d366;
+  --bubble-deep: #12a850;
+  --bubble-glow: rgba(37, 211, 102, 0.6);
+  --bubble-glow-strong: rgba(37, 211, 102, 0.75);
+}
+
+.bubble-3d--chat {
+  --bubble-top: #ff5c9c;
+  --bubble: #ff176e;
+  --bubble-deep: #cc0055;
+  --bubble-glow: rgba(255, 23, 110, 0.65);
+  --bubble-glow-strong: rgba(255, 23, 110, 0.8);
+}
+
+.bubble-3d--call {
+  --bubble-top: #c98cff;
+  --bubble: #b356ff;
+  --bubble-deep: #8d2ce8;
+  --bubble-glow: rgba(179, 86, 255, 0.6);
+  --bubble-glow-strong: rgba(179, 86, 255, 0.75);
+}
+
+/* The lift is decoration; the focus ring is not. Keep the ring, drop the move. */
+@media (prefers-reduced-motion: reduce) {
+  .bubble-3d,
+  .bubble-3d svg {
+    transition: none;
+  }
+
+  .bubble-3d:hover,
+  .bubble-3d:active {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared 3D depth recipe for buttons                                  */
+/* ------------------------------------------------------------------ */
+/* Same construction as `.bubble-3d` above, deliberately: a top gloss, a
+ * vertical light→base→deep ramp, an inset top rim plus an inner bottom shade,
+ * and a two-part outer shadow — a tight contact shadow that seats the control
+ * on the page, and a wider tinted ambient glow. Sharing the language is what
+ * makes the dock bubbles and the buttons read as lit by the same lamp rather
+ * than assembled from two different kits.
+ *
+ * One deliberate difference: a button is wide, so its gloss is a linear ramp
+ * rather than a radial sheen. A radial highlight on a 200px pill reads as a
+ * bulge, not a surface.
+ *
+ * Amplitude is driven by custom properties, so a small icon button reuses the
+ * construction at lower strength (`.btn-3d--soft`) instead of acquiring its own
+ * hand-tuned shadow chain. The palette modifiers below set colours only.
+ *
+ * CONTRAST: --btn-top, --btn and --btn-deep are all surfaces the label can
+ * sit on, so all three must clear AA against their ink — the ramp is only free
+ * while that holds. Check all three, not just the base colour; the deep stop is
+ * the one that usually breaks. For the pink ramp the dark #050507 label
+ * measures 6.45:1 at the top, 5.43:1 at the base and 4.56:1 at the deep stop.
+ * An earlier candidate, #d90f61, came in at 4.06:1 and was rejected.
+ */
+.btn-3d {
+  --btn-gloss: 0.28;
+  --btn-rim: 0.45;
+  --btn-shade: 0.3;
+  --btn-contact: 0.34;
+  --btn-lift: -2px;
+  --btn-press: 1px;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, var(--btn-gloss)) 0%,
+      rgba(255, 255, 255, calc(var(--btn-gloss) * 0.2)) 46%,
+      rgba(255, 255, 255, 0) 58%
+    ),
+    linear-gradient(
+      180deg,
+      var(--btn-top) 0%,
+      var(--btn) 52%,
+      var(--btn-deep) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, var(--btn-rim)),
+    inset 0 -2px 5px -2px rgba(0, 0, 0, var(--btn-shade)),
+    0 1px 1px rgba(0, 0, 0, var(--btn-contact)),
+    0 7px 16px -7px rgba(0, 0, 0, calc(var(--btn-contact) * 1.3)),
+    0 16px 34px -14px var(--btn-glow-color);
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+/* Hover: the control lifts toward the light and its glow spreads. */
+.btn-3d:hover {
+  transform: translateY(var(--btn-lift));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, calc(var(--btn-rim) + 0.15)),
+    inset 0 -2px 5px -2px rgba(0, 0, 0, var(--btn-shade)),
+    0 2px 3px rgba(0, 0, 0, var(--btn-contact)),
+    0 12px 24px -8px rgba(0, 0, 0, calc(var(--btn-contact) * 1.3)),
+    0 22px 46px -14px var(--btn-glow-color-strong, var(--btn-glow-color));
+}
+
+/* Pressed: it flattens into its own shadow rather than lifting further. */
+.btn-3d:active {
+  transform: translateY(var(--btn-press)) scale(0.985);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 3px 7px -1px rgba(0, 0, 0, calc(var(--btn-shade) * 1.6)),
+    0 1px 2px rgba(0, 0, 0, var(--btn-contact)),
+    0 5px 12px -6px var(--btn-glow-color);
+}
+
+/* A disabled control must not still look pressable. */
+.btn-3d:disabled,
+.btn-3d:disabled:hover,
+.btn-3d:disabled:active {
+  transform: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* The same idea for inert elements that are not real <button>s and so never
+ * match :disabled — the pager's arrows at either end are `<Link>`s carrying
+ * `aria-disabled` plus `pointer-events-none`. Without this they would still
+ * render a raised surface, which reads as clickable right up until you try. */
+.btn-3d--flat,
+.btn-3d--flat:hover,
+.btn-3d--flat:active {
+  background-image: none;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Reduced amplitude for icon buttons, chips and toggles. Same construction,
+ * smaller numbers — a 40px control with a 34px shadow reads as a sticker. */
+.btn-3d--soft {
+  --btn-gloss: 0.14;
+  --btn-rim: 0.22;
+  --btn-shade: 0.34;
+  --btn-contact: 0.3;
+  --btn-lift: -1px;
+}
+
+/* Brand pink — the primary call to action. */
+.btn-3d--pink {
+  --btn-top: #ff4b8f;
+  --btn: #ff176e;
+  --btn-deep: #e81263;
+  --btn-glow-color: rgba(255, 23, 110, 0.55);
+  --btn-glow-color-strong: rgba(255, 23, 110, 0.7);
+}
+
+/* Hover brightens the whole ramp rather than only the glow — 7.65:1 / 6.08:1 /
+ * 4.83:1 against the dark label, so it stays legible while it lights up. */
+.btn-3d--pink:hover {
+  --btn-top: #ff6ba3;
+  --btn: #ff3d88;
+  --btn-deep: #ef1568;
+  --btn-glow-color: rgba(255, 23, 110, 0.65);
+  --btn-glow-color-strong: rgba(255, 23, 110, 0.8);
+}
+
+/* White. Hover swaps the entire ramp to brand pink: because the recipe reads
+ * the variables, that is a palette change rather than a second shadow chain,
+ * so every depth cue survives the swap for free. */
+.btn-3d--white {
+  --btn-top: #ffffff;
+  --btn: #f4f4f7;
+  --btn-deep: #cfcfd6;
+  --btn-glow-color: rgba(0, 0, 0, 0.5);
+}
+
+.btn-3d--white:hover {
+  --btn-top: #ff4b8f;
+  --btn: #ff176e;
+  --btn-deep: #e81263;
+  --btn-glow-color: rgba(255, 23, 110, 0.6);
+  --btn-glow-color-strong: rgba(255, 23, 110, 0.75);
+}
+
+/* Dark glass, for icon controls that float over page content. The lightest
+ * stop keeps the #d4d4d8 glyph at 8.96:1. */
+.btn-3d--ink {
+  --btn-top: #2f2f39;
+  --btn: #17171d;
+  --btn-deep: #0c0c11;
+  --btn-glow-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Outline and ghost: no ramp, because there is no surface to ramp. The whole
+ * construction is carried by the rim, the inner shade and the outer shadows —
+ * which is exactly what makes an otherwise flat bordered pill read as a raised
+ * pane of glass. */
+.btn-3d--outline {
+  background-image: none;
+  --btn-rim: 0.12;
+  --btn-shade: 0.5;
+  --btn-contact: 0.3;
+  --btn-glow-color: rgba(0, 0, 0, 0.45);
+}
+
+/* Text-only controls stay visually subordinate to the primary call to action —
+ * they get the depth cues, but nothing that competes. */
+.btn-3d--ghost {
+  background-image: none;
+  --btn-gloss: 0;
+  --btn-rim: 0.08;
+  --btn-shade: 0.18;
+  --btn-contact: 0.18;
+  --btn-lift: -1px;
+  --btn-glow-color: rgba(0, 0, 0, 0);
+  --btn-glow-color-strong: rgba(0, 0, 0, 0);
+}
+
+/* A control that also animates its own visibility — the back-to-top button
+ * fades and slides in on scroll — needs those properties in the transition
+ * list as well. The recipe's `transition` replaces the element's, so without
+ * this the reveal would snap instead of easing.
+ *
+ * `translate` and `opacity` are the two that matter, and `translate` is easy to
+ * miss: Tailwind v4 emits `translate-*` / `rotate-*` / `scale-*` as the
+ * standalone `translate` / `rotate` / `scale` CSS properties, NOT as
+ * `transform`. So a `translate-y-4` reveal is animating `translate`, and a
+ * transition list naming only `transform` would silently leave it snapping —
+ * which is exactly what the first version of this rule did. The lift shares the
+ * reveal's timing because one property cannot ease at two speeds. */
+.btn-3d--reveal {
+  transition:
+    opacity 320ms ease,
+    translate 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-3d {
+    transition: none;
+  }
+
+  .btn-3d:hover,
+  .btn-3d:active {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+@keyframes launch-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  animation: launch-marquee 42s linear infinite;
+}
+
+@keyframes launch-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: launch-float 7s ease-in-out infinite;
+}
+
+/* Slow conic sweep used behind premium panels. */
+@keyframes launch-sweep {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.animate-sweep {
+  animation: launch-sweep 18s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-float,
+  .animate-sweep {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Scrollbars                                                          */
+/* ------------------------------------------------------------------ */
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 23, 110, 0.55);
+}
+
+/* ------------------------------------------------------------------ */
+/* Long-form article typography                                        */
+/* ------------------------------------------------------------------ */
+
+.article-body p {
+  color: rgb(161 161 170);
+  line-height: 1.85;
+}
+
+.article-body strong {
+  color: rgb(244 244 245);
+  font-weight: 600;
 }

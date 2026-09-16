@@ -2,8 +2,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FloatingDock from "@/components/FloatingDock";
+import LeadModal from "@/components/LeadModal";
 import JsonLd from "@/components/JsonLd";
-import { site } from "@/lib/site";
+import { areasServedSchema, site } from "@/lib/site";
+import { og, twitter, clamp } from "@/lib/seo";
 
 
 const geistSans = Geist({
@@ -19,10 +22,10 @@ const geistMono = Geist_Mono({
 export const metadata = {
   metadataBase: new URL(site.domain),
   title: {
-    default: "Loud Launchers — Digital Launch Studio for Websites, Apps & Growth",
+    default: "Loud Launchers — Digital Launch Studio for Websites & Apps",
     template: "%s | Loud Launchers",
   },
-  description: site.description,
+  description: clamp(site.description),
   keywords: [
     "digital launch studio",
     "digital marketing agency",
@@ -30,36 +33,27 @@ export const metadata = {
     "mobile app development",
     "performance marketing",
     "SEO agency",
+    "answer engine optimization",
+    "generative engine optimization",
     "branding agency",
     "social media management",
+    "website cost",
+    "conversion rate optimization",
   ],
   applicationName: site.name,
   authors: [{ name: site.name, url: site.domain }],
   creator: site.name,
   publisher: site.name,
   alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: site.domain,
-    siteName: site.name,
+  openGraph: og({
     title: "Loud Launchers — Digital ideas built for lift-off",
     description: site.shortDescription,
-    images: [
-      {
-        url: "/blog/fuel-digital-growth.png",
-        width: 1200,
-        height: 1200,
-        alt: "Fuel your digital growth — Loud Launchers",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
+    path: "",
+  }),
+  twitter: twitter({
     title: "Loud Launchers — Digital ideas built for lift-off",
     description: site.shortDescription,
-    images: ["/blog/fuel-digital-growth.png"],
-  },
+  }),
   robots: {
     index: true,
     follow: true,
@@ -83,35 +77,42 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+      /* Was ["Organization", "LocalBusiness", "ProfessionalService"].
+       *
+       * LocalBusiness — and ProfessionalService, which is one of its subtypes —
+       * are place-based types. Google expects a real address and coordinates on
+       * them, and this site deliberately no longer has either. Claiming a
+       * location we cannot substantiate earns nothing, because a dummy address
+       * was never eligible for local results, and it risks Search Console
+       * warnings for missing fields.
+       *
+       * Organization is the accurate type for a remote-first studio and carries
+       * everything that actually does work here: brand name and logo, a contact
+       * point, the areas served, and the social profiles that tie the entity
+       * together for knowledge-panel and answer-engine purposes.
+       *
+       * If a real studio address is ever added to `site.address`, restore
+       * LocalBusiness here together with the PostalAddress and GeoCoordinates. */
+      "@type": "Organization",
       "@id": `${site.domain}/#organization`,
       name: site.name,
       legalName: site.legalName,
       url: site.domain,
-      logo: `${site.domain}/logo.png`,
-      image: `${site.domain}/blog/fuel-digital-growth.png`,
+      logo: `${site.domain}/logo.webp`,
+      image: `${site.domain}/og.png`,
       description: site.description,
       email: site.email,
       telephone: site.phone,
       foundingDate: site.foundingDate,
-      priceRange: "$$",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: site.address.street,
-        addressLocality: site.address.city,
-        addressRegion: site.address.region,
-        postalCode: site.address.postalCode,
-        addressCountry: site.address.country,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        telephone: site.phone,
+        email: site.email,
+        availableLanguage: ["English"],
+        areaServed: areasServedSchema(),
       },
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: site.geo.latitude,
-        longitude: site.geo.longitude,
-      },
-      areaServed: site.areasServed.map((name) => ({
-        "@type": "Country",
-        name,
-      })),
+      areaServed: areasServedSchema(),
       openingHoursSpecification: [
         {
           "@type": "OpeningHoursSpecification",
@@ -139,11 +140,20 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth bg-[#050507] motion-reduce:scroll-auto`}
     >
-      <body className="min-h-screen overflow-x-clip bg-[#050507] font-sans text-white antialiased selection:bg-[#ff176e] selection:text-white">
+      <body className="min-h-screen overflow-x-clip bg-[#050507] font-sans text-white antialiased selection:bg-[#ff176e] selection:text-[#050507]">
+        {/* Reveal animations start hidden and are switched on by JS. Without JS the
+            content would never appear, so force it visible for those visitors.
+            dangerouslySetInnerHTML is the React-safe way to render noscript content. */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html:
+              "<style>[data-reveal]{opacity:1!important;transform:none!important}</style>",
+          }}
+        />
         <JsonLd data={organizationSchema} />
         <a
           href="#main"
-          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-white px-5 py-3 font-semibold text-black transition focus:translate-y-0"
+          className="btn-3d btn-3d--white fixed left-4 top-4 z-[100] -translate-y-24 rounded-full px-5 py-3 font-semibold text-black focus:translate-y-0"
         >
           Skip to content
         </a>
@@ -152,6 +162,8 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <Footer />
+        <FloatingDock />
+        <LeadModal />
       </body>
     </html>
   );

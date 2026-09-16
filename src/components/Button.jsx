@@ -1,9 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { openLead } from "@/lib/lead";
 
 /**
  * Button component used across pages.
  * variant: "primary" (solid pink) | "secondary" (white) | "outline" | "ghost"
  * href renders a next/link, otherwise a <button>.
+ *
+ * Pass `opensLead` to have the button raise the lead modal instead of
+ * navigating — the default path for every "Start a project" call to action.
+ * `leadSource` is recorded with the submission so you can see which CTA
+ * converted. Server components can use these props freely: only the boolean
+ * crosses the boundary, never a callback.
+ *
+ * The depth treatment lives in `globals.css` as the `.btn-3d` family, not here.
+ * Each variant only names a palette; the recipe owns the background ramp, the
+ * shadows, the hover lift, the press and the transition. Do NOT reintroduce
+ * `shadow-*`, `transition` or `hover:-translate-y-*` utilities on these — two
+ * owners for the same property is how one button ends up lifting twice.
  */
 export default function Button({
   href,
@@ -12,19 +27,19 @@ export default function Button({
   size = "md",
   className = "",
   arrow = true,
+  opensLead = false,
+  leadSource = "cta",
   ...props
 }) {
   const base =
-    "group inline-flex items-center justify-center gap-3 rounded-full font-bold transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-400 disabled:pointer-events-none disabled:opacity-50";
+    "group inline-flex items-center justify-center gap-3 rounded-full font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-400 disabled:pointer-events-none disabled:opacity-50";
 
   const variants = {
-    primary:
-      "bg-[#ff176e] text-white shadow-2xl shadow-pink-900/30 hover:-translate-y-0.5 hover:bg-[#ff3d88] hover:shadow-pink-600/25",
-    secondary:
-      "bg-white text-black hover:-translate-y-0.5 hover:bg-[#ff176e] hover:text-white",
+    primary: "btn-3d btn-3d--pink text-[#050507]",
+    secondary: "btn-3d btn-3d--white text-black",
     outline:
-      "border border-white/20 text-white hover:-translate-y-0.5 hover:border-[#ff176e] hover:bg-[#ff176e]/10",
-    ghost: "text-zinc-300 hover:text-white",
+      "btn-3d btn-3d--outline border border-white/20 text-white hover:border-[#ff176e] hover:bg-[#ff176e]/10",
+    ghost: "btn-3d btn-3d--ghost text-zinc-300 hover:text-white",
   };
 
   const sizes = {
@@ -54,6 +69,19 @@ export default function Button({
       )}
     </>
   );
+
+  if (opensLead) {
+    return (
+      <button
+        type="button"
+        onClick={() => openLead(leadSource)}
+        className={classes}
+        {...props}
+      >
+        {inner}
+      </button>
+    );
+  }
 
   if (href) {
     return (

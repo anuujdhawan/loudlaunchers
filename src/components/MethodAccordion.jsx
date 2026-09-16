@@ -14,7 +14,7 @@ export default function MethodAccordion() {
         </p>
         <h2 className="mt-5 text-5xl font-black uppercase leading-[0.9] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
           From signal
-          <br />
+          <br />{" "}
           to <span className="text-[#ff176e]">lift-off.</span>
         </h2>
         <p className="mt-7 max-w-md text-lg leading-relaxed text-zinc-400">
@@ -22,7 +22,7 @@ export default function MethodAccordion() {
           business close to the process.
         </p>
         <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted">
             Active stage
           </p>
           <div className="mt-4 flex items-center gap-4">
@@ -31,7 +31,7 @@ export default function MethodAccordion() {
             </span>
             <div>
               <p className="font-bold text-white">{stages[active].title}</p>
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-muted">
                 {stages[active].subtitle}
               </p>
             </div>
@@ -49,7 +49,7 @@ export default function MethodAccordion() {
               onClick={() => setActive(index)}
               aria-pressed={isActive}
               className={`group grid w-full gap-5 border-b border-white/10 py-8 text-left transition sm:grid-cols-[4rem_1fr_auto] sm:items-center ${
-                isActive ? "text-white" : "text-zinc-500 hover:text-white"
+                isActive ? "text-white" : "text-muted hover:text-white"
               }`}
             >
               <span className={`font-mono text-sm ${isActive ? "text-[#ff4b8f]" : ""}`}>
@@ -63,14 +63,21 @@ export default function MethodAccordion() {
                   {stage.description}
                 </span>
               </span>
+              {/* The row is a flat list row, so the depth treatment belongs on
+                  its trailing disc — that is the part that reads as a button.
+                  The rotation lives on the glyph rather than on the disc so the
+                  intent is explicit; the disc is radially symmetric, so
+                  rotating it instead would look identical. */}
               <span
-                className={`flex h-11 w-11 items-center justify-center rounded-full transition group-hover:rotate-45 ${
+                className={`btn-3d flex h-11 w-11 items-center justify-center rounded-full ${
                   isActive
-                    ? "bg-[#ff176e] text-white"
-                    : "border border-white/10 group-hover:border-[#ff176e] group-hover:text-[#ff4b8f]"
+                    ? "btn-3d--pink text-[#050507]"
+                    : "btn-3d--outline btn-3d--soft border border-white/10 group-hover:border-[#ff176e] group-hover:text-[#ff4b8f]"
                 }`}
               >
-                ↗
+                <span className="transition duration-300 group-hover:rotate-45">
+                  ↗
+                </span>
               </span>
             </button>
           );

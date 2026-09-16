@@ -14,7 +14,8 @@ export default function Logo({ href = "/", compact = false }) {
           alt="Loud Launchers logo"
           width={40}
           height={40}
-          priority
+          loading="eager"
+          fetchPriority="high"
           className="h-10 w-10 object-contain drop-shadow-[0_0_10px_rgba(255,23,110,.4)]"
         />
       </span>
@@ -23,7 +24,7 @@ export default function Logo({ href = "/", compact = false }) {
           <span className="block text-sm font-black uppercase leading-none tracking-[0.12em] text-white">
             Loud <span className="text-[#ff2d7d]">Launchers</span>
           </span>
-          <span className="mt-1.5 block text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+          <span className="mt-1.5 block text-[9px] font-semibold uppercase tracking-[0.24em] text-muted">
             Digital launch studio
           </span>
         </span>

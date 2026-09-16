@@ -223,7 +223,8 @@ export default function HeroLaunch() {
               alt="Loud Launchers"
               width={512}
               height={512}
-              priority
+              loading="eager"
+              fetchPriority="high"
               className="h-auto w-[19rem] object-contain drop-shadow-[0_0_20px_rgba(255,23,110,.5)] sm:w-[22rem]"
             />
           </div>
@@ -264,7 +265,7 @@ export default function HeroLaunch() {
 
       {/* HUD: current mission (rotating) */}
       <div className="absolute right-[2%] top-[12%] hidden rounded-2xl border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-xl sm:block">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">
           Current mission
         </p>
         <p
@@ -280,9 +281,16 @@ export default function HeroLaunch() {
       <button
         type="button"
         onClick={ignite}
-        className="group absolute bottom-[5%] right-[3%] hidden items-center gap-3 rounded-full border border-white/10 bg-black/40 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 backdrop-blur-xl transition hover:border-[#ff176e]/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-400 sm:flex"
+        className="btn-3d btn-3d--outline btn-3d--soft group absolute bottom-[5%] right-[3%] hidden items-center gap-3 rounded-full border border-white/10 bg-black/40 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 backdrop-blur-xl hover:border-[#ff176e]/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-400 sm:flex"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff176e] text-white transition group-hover:scale-110">
+        {/* Dark glyph on the bright pink disc, matching the convention the
+            rest of the site uses on brand surfaces (white on #ff176e is only
+            3.75:1; #050507 is 5.4:1). Decorative — the button's own label
+            already says "Replay ignition". */}
+        <span
+          aria-hidden="true"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff176e] text-[#050507] transition group-hover:scale-110"
+        >
           ↑
         </span>
         Replay ignition

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import HeroCanvas from "@/components/HeroCanvas";
 import HeroLaunch from "@/components/HeroLaunch";
@@ -8,8 +7,9 @@ import SectionHeading, { TextLink } from "@/components/SectionHeading";
 import MethodAccordion from "@/components/MethodAccordion";
 import FaqAccordion from "@/components/FaqAccordion";
 import CtaSection from "@/components/CtaSection";
-import { services, differentiators, faqs, faqSchema } from "@/lib/site";
-import { getFeaturedPosts, formatDate } from "@/lib/posts";
+import PostCard from "@/components/PostCard";
+import { services, differentiators, faqs, faqSchema, stats } from "@/lib/site";
+import { getFeaturedPosts } from "@/lib/blog";
 import JsonLd from "@/components/JsonLd";
 
 export default function Home() {
@@ -52,9 +52,9 @@ export default function Home() {
                 className="mt-7 text-[clamp(3.8rem,8vw,8.2rem)] font-black uppercase leading-[0.82] tracking-[-0.075em] text-white"
               >
                 Think it.
-                <br />
+                <br />{" "}
                 Build it.
-                <br />
+                <br />{" "}
                 <span className="bg-gradient-to-r from-[#ff176e] via-[#ff5aa1] to-[#b356ff] bg-clip-text text-transparent">
                   Launch it.
                 </span>
@@ -94,7 +94,7 @@ export default function Home() {
 
             <Reveal
               delay={400}
-              className="mt-12 flex flex-wrap gap-x-7 gap-y-3 border-t border-white/10 pt-6 text-xs font-medium uppercase tracking-[0.15em] text-zinc-500"
+              className="mt-12 flex flex-wrap gap-x-7 gap-y-3 border-t border-white/10 pt-6 text-xs font-medium uppercase tracking-[0.15em] text-muted"
             >
               <span>Strategy-led</span>
               <span className="text-[#ff176e]">•</span>
@@ -107,29 +107,60 @@ export default function Home() {
           <HeroLaunch />
         </div>
 
-        <div className="absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-3 pb-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 lg:flex">
+        <div className="absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-3 pb-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted lg:flex">
           <span className="h-8 w-px bg-gradient-to-b from-[#ff176e] to-transparent" />
           Scroll to explore
         </div>
       </section>
 
-      {/* Capabilities strip */}
+      {/* Credibility band — capability ticker + headline numbers */}
       <section
-        aria-label="Loud Launchers capabilities"
-        className="border-b border-white/10 bg-[#08080b] px-5 py-5 sm:px-8 lg:px-12"
+        aria-label="Loud Launchers at a glance"
+        className="relative overflow-hidden border-b border-white/10 bg-[#08080b]"
       >
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-bold uppercase tracking-[0.17em] text-zinc-500 lg:justify-between">
-          <span>Web experiences</span>
-          <span className="text-[#ff176e]">✦</span>
-          <span>Mobile products</span>
-          <span className="text-[#ff176e]">✦</span>
-          <span>Performance marketing</span>
-          <span className="text-[#ff176e]">✦</span>
-          <span>Search growth</span>
-          <span className="text-[#ff176e]">✦</span>
-          <span>Brand systems</span>
-          <span className="text-[#ff176e]">✦</span>
-          <span>Social momentum</span>
+        <div
+          aria-hidden="true"
+          className="overflow-hidden border-b border-white/[0.07] py-4"
+        >
+          <div className="animate-marquee flex w-max items-center">
+            {[0, 1].map((copy) => (
+              <ul key={copy} className="flex items-center">
+                {[
+                  "Web experiences",
+                  "Mobile products",
+                  "Performance marketing",
+                  "Search growth",
+                  "Brand systems",
+                  "Social momentum",
+                  "AI-era visibility",
+                ].map((word) => (
+                  <li
+                    key={`${copy}-${word}`}
+                    className="flex items-center whitespace-nowrap px-6 text-xs font-bold uppercase tracking-[0.22em] text-subtle"
+                  >
+                    {word}
+                    <span className="ml-6 text-[#ff176e]">✦</span>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-auto grid max-w-[1500px] grid-cols-2 gap-x-6 gap-y-8 px-5 py-10 sm:px-8 lg:grid-cols-4 lg:px-12">
+          {stats.map((stat, index) => (
+            <Reveal key={stat.label} delay={index * 70}>
+              <p className="font-mono text-3xl font-bold text-white sm:text-4xl">
+                {stat.value}
+              </p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ff4b8f]">
+                {stat.label}
+              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted">
+                {stat.detail}
+              </p>
+            </Reveal>
+          ))}
         </div>
       </section>
 
@@ -147,7 +178,7 @@ export default function Home() {
                 title={
                   <>
                     From average
-                    <br />
+                    <br />{" "}
                     to <span className="text-[#ff176e]">extraordinary.</span>
                   </>
                 }
@@ -190,7 +221,7 @@ export default function Home() {
               title={
                 <>
                   Six services. One connected
-                  <br />
+                  <br />{" "}
                   growth <span className="text-[#ff176e]">engine.</span>
                 </>
               }
@@ -216,7 +247,7 @@ export default function Home() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1.3"
-                    className="h-9 w-9 text-zinc-500 transition group-hover:text-[#ff4b8f]"
+                    className="h-9 w-9 text-muted transition group-hover:text-[#ff4b8f]"
                   >
                     <path d={service.iconPath} />
                   </svg>
@@ -229,13 +260,19 @@ export default function Home() {
                 </p>
                 <div className="mt-8 flex items-center justify-between gap-4">
                   <Link
-                    href="/contact"
-                    className="font-bold text-white transition hover:text-[#ff4b8f]"
-                    aria-label={`Start a ${service.short} project with Loud Launchers`}
+                    href={`/services/${service.slug}`}
+                    className="inline-flex items-center gap-2 font-bold text-white transition hover:text-[#ff4b8f]"
+                    aria-label={`Explore ${service.short} services from Loud Launchers`}
                   >
-                    Start a project →
+                    Explore
+                    <span
+                      aria-hidden="true"
+                      className="transition duration-300 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
                   </Link>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-600">
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-subtle">
                     {service.short}
                   </span>
                 </div>
@@ -276,7 +313,7 @@ export default function Home() {
               title={
                 <>
                   Signals from
-                  <br />
+                  <br />{" "}
                   the <span className="text-[#ff176e]">launchpad.</span>
                 </>
               }
@@ -285,39 +322,10 @@ export default function Home() {
             <TextLink href="/blog">All insights</TextLink>
           </Reveal>
 
-          <div className="mt-14 grid gap-4 md:grid-cols-3">
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
             {featured.map((post, index) => (
-              <Reveal
-                key={post.slug}
-                delay={index * 90}
-                as="article"
-                className="group flex flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#111116] transition duration-500 hover:-translate-y-1 hover:border-[#ff176e]/50"
-              >
-                <Link href={`/blog/${post.slug}`} className="flex flex-1 flex-col">
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={post.image}
-                      alt={post.imageAlt}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="flex flex-1 flex-col p-7">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ff4b8f]">
-                      {post.category}
-                    </p>
-                    <h3 className="mt-3 text-xl font-bold leading-snug text-white transition group-hover:text-[#ff4b8f]">
-                      {post.title}
-                    </h3>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-400">
-                      {post.description}
-                    </p>
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                      {formatDate(post.date)} · {post.readingTime}
-                    </p>
-                  </div>
-                </Link>
+              <Reveal key={post.slug} delay={index * 90} className="h-full">
+                <PostCard post={post} />
               </Reveal>
             ))}
           </div>
@@ -337,7 +345,7 @@ export default function Home() {
               title={
                 <>
                   Questions,
-                  <br />
+                  <br />{" "}
                   <span className="text-[#ff176e]">answered.</span>
                 </>
               }

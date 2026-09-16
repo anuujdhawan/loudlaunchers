@@ -1,13 +1,26 @@
 import Button from "./Button";
 import Reveal from "./Reveal";
 
+/* The page-level closing CTA.
+ *
+ * These defaults are deliberately NOT the same words the footer band uses
+ * ("Ready when you are" / "Your next launch starts with a stronger story.").
+ * The footer renders on every page, so when this section reused that copy the
+ * two bands produced an identical <h2> twice in one document — the home page,
+ * both detail-page types and the blog posts all shipped a duplicated heading.
+ * Two headings with the same text give an answer engine no way to tell the two
+ * sections apart, and the document outline ends up with a repeated node.
+ *
+ * Every page that renders this section either passes its own copy or gets the
+ * distinct default below, so no page can repeat the footer's heading again.
+ * If you change the footer CTA, do not copy its wording here. */
 export default function CtaSection({
-  eyebrow = "Ready when you are",
+  eyebrow = "Next step",
   title = (
     <>
-      Your next launch starts
-      <br />
-      with a stronger <span className="text-[#ff176e]">story.</span>
+      Time to launch
+      <br />{" "}
+      something <span className="text-[#ff176e]">loud.</span>
     </>
   ),
   lede = "Whether you need a powerful website, a connected mobile app, stronger visibility, a sharper brand or better day-to-day digital momentum — we are ready to help you move forward with confidence.",
@@ -29,7 +42,7 @@ export default function CtaSection({
           {lede}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Button href="/contact" size="lg">
+          <Button opensLead leadSource="cta-section" size="lg">
             Start a project
           </Button>
           <Button href="/blog" variant="outline" size="lg" arrow={false}>
