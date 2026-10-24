@@ -10,7 +10,7 @@ export const site = {
   /* Single source of truth for the contact address. Changing it updates the
      header utility bar, the footer, the contact page, the about page, the
      Organization schema, llms.txt and the `mailto:` fallback in lead.js. */
-  email: "anoojdhawan@gmail.com",
+  email: "info@loudlaunchers.com",
   /* Single source of truth for the studio number. `phone` is E.164 (used for
      tel: links and the Organization schema telephone property); `phoneDisplay`
      is the human-readable grouping. Change these two and the header, footer,

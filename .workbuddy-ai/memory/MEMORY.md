@@ -23,7 +23,7 @@ New entries propagate to nav, mega menu, footer, `/blog`, `/services`, `sitemap.
 
 ## Contact details
 `src/lib/site.js` only: `phone` E.164 (`+919468055396`), `phoneDisplay` grouped,
-`whatsapp.number` digits only (`wa.me` needs that), `email` `anoojdhawan@gmail.com`.
+`whatsapp.number` digits only (`wa.me` needs that), `email` `info@loudlaunchers.com`.
 **No postal address, no `geo`** — the old Boston one was invented and contradicted the +91
 number. Schema is `"@type": "Organization"` with `contactPoint`, not `LocalBusiness`.
 `areasServed` → chips (/contact, /about, footer = first 6) + JSON-LD. Mixed granularity
